@@ -5,13 +5,14 @@ abstract class StateController<T> {
   StateController();
 
   @override
-  String toString() => 'Resource of '
+  String toString() =>
+      'Resource of '
       'status: $status, '
       'data: $inferredData, '
       'error message: $inferredErrorMessage';
 
-  factory StateController.idle() {
-    return Idle();
+  factory StateController.idle({T? data}) {
+    return Idle(data);
   }
 
   factory StateController.loading({T? data}) {
@@ -30,10 +31,7 @@ abstract class StateController<T> {
     return Error(errorMessage, code, data);
   }
 
-  factory StateController.of({
-    T? data,
-    String? errorMessage,
-  }) {
+  factory StateController.of({T? data, String? errorMessage}) {
     if (errorMessage != null) {
       return StateController.error(errorMessage: errorMessage, data: data);
     } else if (data != null) {
@@ -165,7 +163,11 @@ class Loading<T> extends StateController<T> {
   final T? data;
 }
 
-class Idle<T> extends StateController<T> {}
+class Idle<T> extends StateController<T> {
+  Idle(this.data);
+
+  final T? data;
+}
 
 class Success<T> extends StateController<T> {
   Success(this.data);

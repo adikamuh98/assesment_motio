@@ -1,5 +1,12 @@
 import 'package:assesment_motio/core/helper/snackbar_helper.dart';
+import 'package:assesment_motio/core/services/hive_service.dart';
 import 'package:assesment_motio/core/themes/app_colors.dart';
+import 'package:assesment_motio/features/home/data/datasources/task_datasource.dart';
+import 'package:assesment_motio/features/home/domain/repositories/task_repository.dart';
+import 'package:assesment_motio/features/home/domain/usecases/add_group.dart';
+import 'package:assesment_motio/features/home/domain/usecases/delete_group.dart';
+import 'package:assesment_motio/features/home/domain/usecases/get_all_groups.dart';
+import 'package:assesment_motio/features/home/domain/usecases/update_group.dart';
 import 'package:assesment_motio/features/home/presentation/bloc/auth_bloc.dart';
 import 'package:assesment_motio/features/home/presentation/home_screen.dart';
 import 'package:assesment_motio/features/login/data/datasources/login_datasource.dart';
@@ -20,6 +27,7 @@ final GlobalKey<NavigatorState> navState = GlobalKey<NavigatorState>();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await HiveService.instance.init();
 
   runApp(MainApp());
 }
@@ -93,6 +101,9 @@ class _MainAppState extends State<MainApp> {
       RepositoryProvider<LoginRepository>(
         create: (context) => LoginRepository(datasource: LoginDatasource()),
       ),
+      RepositoryProvider<TaskRepository>(
+        create: (context) => TaskRepository(datasource: TaskDatasource()),
+      ),
     ];
   }
 
@@ -103,6 +114,18 @@ class _MainAppState extends State<MainApp> {
       ),
       RepositoryProvider<LoginFirebase>(
         create: (context) => LoginFirebase(context.read<LoginRepository>()),
+      ),
+      RepositoryProvider<GetAllGroups>(
+        create: (context) => GetAllGroups(context.read<TaskRepository>()),
+      ),
+      RepositoryProvider<AddGroup>(
+        create: (context) => AddGroup(context.read<TaskRepository>()),
+      ),
+      RepositoryProvider<UpdateGroup>(
+        create: (context) => UpdateGroup(context.read<TaskRepository>()),
+      ),
+      RepositoryProvider<DeleteGroup>(
+        create: (context) => DeleteGroup(context.read<TaskRepository>()),
       ),
     ];
   }

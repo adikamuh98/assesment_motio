@@ -30,6 +30,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.11.0"
+  appflowy_board:
+    dependency: "direct main"
+    description:
+      name: appflowy_board
+      sha256: "4dc5ce013913723ca330db350df154abdf1315285bcf61a35d65471e9ea00517"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.2"
   args:
     dependency: transitive
     description:
@@ -470,7 +478,7 @@ packages:
     source: hosted
     version: "4.1.2"
   intl:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: intl
       sha256: "3df61194eb431efc39c4ceba583b95633a403f46c9fd341e550ce0bfa50e9aa5"
