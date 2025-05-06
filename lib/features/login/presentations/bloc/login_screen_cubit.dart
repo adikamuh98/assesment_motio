@@ -1,4 +1,5 @@
 import 'package:assesment_motio/core/models/state_controller.dart';
+import 'package:assesment_motio/core/services/hive_service.dart';
 import 'package:assesment_motio/core/services/storage_service.dart';
 import 'package:assesment_motio/features/home/presentation/bloc/auth_bloc.dart';
 import 'package:assesment_motio/features/login/data/models/login_request.dart';
@@ -23,6 +24,7 @@ class LoginScreenCubit extends Cubit<StateController<bool>> {
           SecureKey.token,
           token,
         );
+        await HiveService.instance.initGroupBox();
         emit(StateController.success(true));
       } else {
         emit(StateController.error(errorMessage: 'Failed to login'));

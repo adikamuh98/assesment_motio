@@ -4,9 +4,11 @@ import 'package:assesment_motio/core/themes/app_colors.dart';
 import 'package:assesment_motio/features/home/data/datasources/task_datasource.dart';
 import 'package:assesment_motio/features/home/domain/repositories/task_repository.dart';
 import 'package:assesment_motio/features/home/domain/usecases/add_group.dart';
+import 'package:assesment_motio/features/home/domain/usecases/add_task_to_group.dart';
 import 'package:assesment_motio/features/home/domain/usecases/delete_group.dart';
 import 'package:assesment_motio/features/home/domain/usecases/get_all_groups.dart';
 import 'package:assesment_motio/features/home/domain/usecases/update_group.dart';
+import 'package:assesment_motio/features/home/domain/usecases/update_task_in_group.dart';
 import 'package:assesment_motio/features/home/presentation/bloc/auth_bloc.dart';
 import 'package:assesment_motio/features/home/presentation/home_screen.dart';
 import 'package:assesment_motio/features/login/data/datasources/login_datasource.dart';
@@ -126,6 +128,12 @@ class _MainAppState extends State<MainApp> {
       ),
       RepositoryProvider<DeleteGroup>(
         create: (context) => DeleteGroup(context.read<TaskRepository>()),
+      ),
+      RepositoryProvider<AddTaskToGroup>(
+        create: (context) => AddTaskToGroup(context.read<TaskRepository>()),
+      ),
+      RepositoryProvider<UpdateTaskInGroup>(
+        create: (context) => UpdateTaskInGroup(context.read<TaskRepository>()),
       ),
     ];
   }

@@ -6,7 +6,7 @@ part 'task_model.g.dart';
 @HiveType(typeId: 1)
 class TaskModel extends AppFlowyGroupItem {
   @HiveField(0)
-  late final String _id;
+  final String taskId;
   @HiveField(1)
   final String name;
   @HiveField(2)
@@ -19,39 +19,42 @@ class TaskModel extends AppFlowyGroupItem {
   final String createdAt;
   @HiveField(6)
   final String updatedAt;
+  @HiveField(7)
+  final int orderIndex;
 
   TaskModel({
-    String id = '',
+    required this.taskId,
     required this.name,
     required this.description,
     required this.isCompleted,
     required this.dueDate,
     required this.createdAt,
     required this.updatedAt,
-  }) {
-    _id = id;
-  }
+    required this.orderIndex,
+  });
 
   @override
-  String get id => _id;
+  String get id => taskId;
 
   TaskModel copyWith({
-    String? id,
+    String? taskId,
     String? name,
     String? description,
     bool? isCompleted,
     String? dueDate,
     String? createdAt,
     String? updatedAt,
+    int? orderIndex,
   }) {
     return TaskModel(
-      id: id ?? _id,
+      taskId: taskId ?? this.taskId,
       name: name ?? this.name,
       description: description ?? this.description,
       isCompleted: isCompleted ?? this.isCompleted,
       dueDate: dueDate ?? this.dueDate,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      orderIndex: orderIndex ?? this.orderIndex,
     );
   }
 }

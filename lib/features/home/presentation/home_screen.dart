@@ -1,4 +1,5 @@
 import 'package:appflowy_board/appflowy_board.dart';
+import 'package:assesment_motio/core/helper/snackbar_helper.dart';
 import 'package:assesment_motio/core/models/state_controller.dart';
 import 'package:assesment_motio/core/themes/app_button.dart';
 import 'package:assesment_motio/core/themes/app_colors.dart';
@@ -8,6 +9,7 @@ import 'package:assesment_motio/features/home/domain/usecases/add_group.dart';
 import 'package:assesment_motio/features/home/domain/usecases/delete_group.dart';
 import 'package:assesment_motio/features/home/domain/usecases/get_all_groups.dart';
 import 'package:assesment_motio/features/home/domain/usecases/update_group.dart';
+import 'package:assesment_motio/features/home/domain/usecases/update_task_in_group.dart';
 import 'package:assesment_motio/features/home/presentation/bloc/auth_bloc.dart';
 import 'package:assesment_motio/features/home/presentation/bloc/home_screen_cubit.dart';
 import 'package:assesment_motio/features/home/presentation/components/add_task_dialog.dart';
@@ -33,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
       addGroupUsecase: context.read<AddGroup>(),
       updateGroupUsecase: context.read<UpdateGroup>(),
       deleteGroupUsecase: context.read<DeleteGroup>(),
+      updateTaskInGroupUsecase: context.read<UpdateTaskInGroup>(),
     )..init();
   }
 
@@ -41,145 +44,6 @@ class _HomeScreenState extends State<HomeScreen> {
     homeScreenCubit.close();
     super.dispose();
   }
-
-  // void _initGroup() {
-  //   final groupTodo = GroupModel(id: 'todo', name: 'To Do');
-  //   final groupInProgress = GroupModel(id: 'in_progress', name: 'In Progress');
-  //   final groupPending = GroupModel(id: 'pending', name: 'Pending');
-  //   final groupDone = GroupModel(id: 'done', name: 'Done');
-
-  //   final group1 = AppFlowyGroupData(
-  //     id: groupTodo.id,
-  //     name: groupTodo.name,
-  //     items: <AppFlowyGroupItem>[
-  //       TaskModel(
-  //         id: 'asdfasdf',
-  //         name: 'Meeting with client',
-  //         description: 'Discuss project requirements',
-  //         group: groupTodo,
-  //         isCompleted: false,
-  //         dueDate: '15-05-2025 10:00:00',
-  //         createdAt: '2020-08-01 10:00:00',
-  //         updatedAt: '2020-08-01 10:00:00',
-  //       ),
-  //       TaskModel(
-  //         id: 'asdfasdf',
-  //         name: 'Meeting with client',
-  //         description: 'Discuss project requirements',
-  //         group: groupTodo,
-  //         isCompleted: false,
-  //         dueDate: '15-05-2025 10:00:00',
-  //         createdAt: '2020-08-01 10:00:00',
-  //         updatedAt: '2020-08-01 10:00:00',
-  //       ),
-  //       TaskModel(
-  //         id: 'asdfasdf',
-  //         name: 'Meeting with client',
-  //         description: 'Discuss project requirements',
-  //         group: groupTodo,
-  //         isCompleted: false,
-  //         dueDate: '15-05-2025 10:00:00',
-  //         createdAt: '2020-08-01 10:00:00',
-  //         updatedAt: '2020-08-01 10:00:00',
-  //       ),
-  //       TaskModel(
-  //         id: 'asdfasdf',
-  //         name: 'Meeting with client',
-  //         description: 'Discuss project requirements',
-  //         group: groupTodo,
-  //         isCompleted: false,
-  //         dueDate: '15-05-2025 10:00:00',
-  //         createdAt: '2020-08-01 10:00:00',
-  //         updatedAt: '2020-08-01 10:00:00',
-  //       ),
-  //       TaskModel(
-  //         id: 'asdfasdf',
-  //         name: 'Meeting with client',
-  //         description: 'Discuss project requirements',
-  //         group: groupTodo,
-  //         isCompleted: false,
-  //         dueDate: '15-05-2025 10:00:00',
-  //         createdAt: '2020-08-01 10:00:00',
-  //         updatedAt: '2020-08-01 10:00:00',
-  //       ),
-  //       TaskModel(
-  //         id: 'asdfasdf',
-  //         name: 'Meeting with client',
-  //         description: 'Discuss project requirements',
-  //         group: groupTodo,
-  //         isCompleted: false,
-  //         dueDate: '15-05-2025 10:00:00',
-  //         createdAt: '2020-08-01 10:00:00',
-  //         updatedAt: '2020-08-01 10:00:00',
-  //       ),
-  //       TaskModel(
-  //         id: 'asdfasdf',
-  //         name: 'Meeting with client',
-  //         description: 'Discuss project requirements',
-  //         group: groupTodo,
-  //         isCompleted: false,
-  //         dueDate: '15-05-2025 10:00:00',
-  //         createdAt: '2020-08-01 10:00:00',
-  //         updatedAt: '2020-08-01 10:00:00',
-  //       ),
-  //     ],
-  //   );
-
-  //   final group2 = AppFlowyGroupData(
-  //     id: groupInProgress.id,
-  //     name: groupInProgress.name,
-  //     items: <AppFlowyGroupItem>[
-  //       TaskModel(
-  //         id: 'asdfasdf',
-  //         name: 'Meeting with client',
-  //         description: 'Discuss project requirements',
-  //         group: groupInProgress,
-  //         isCompleted: false,
-  //         dueDate: '15-05-2025 10:00:00',
-  //         createdAt: '2020-08-01 10:00:00',
-  //         updatedAt: '2020-08-01 10:00:00',
-  //       ),
-  //     ],
-  //   );
-
-  //   final group3 = AppFlowyGroupData(
-  //     id: groupPending.id,
-  //     name: groupPending.name,
-  //     items: <AppFlowyGroupItem>[
-  //       TaskModel(
-  //         id: 'asdfasdf',
-  //         name: 'Meeting with client',
-  //         description: 'Discuss project requirements',
-  //         group: groupInProgress,
-  //         isCompleted: false,
-  //         dueDate: '15-05-2025 10:00:00',
-  //         createdAt: '2020-08-01 10:00:00',
-  //         updatedAt: '2020-08-01 10:00:00',
-  //       ),
-  //     ],
-  //   );
-  //   final group4 = AppFlowyGroupData(
-  //     id: groupDone.id,
-  //     name: groupDone.name,
-  //     items: <AppFlowyGroupItem>[
-  //       TaskModel(
-  //         id: 'asdfasdf',
-  //         name: 'Meeting with client',
-  //         description: 'Discuss project requirements',
-  //         group: groupDone,
-  //         isCompleted: false,
-  //         dueDate: '15-05-2025 10:00:00',
-  //         createdAt: '2020-08-01 10:00:00',
-  //         updatedAt: '2020-08-01 10:00:00',
-  //       ),
-  //     ],
-  //   );
-
-  //   controller.addGroup(group1);
-  //   controller.addGroup(group2);
-  //   controller.addGroup(group3);
-  //   controller.addGroup(group4);
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -195,15 +59,21 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
-              // Add your logout logic here
               context.read<AuthBloc>().add(Logout());
             },
           ),
         ],
       ),
       backgroundColor: Colors.white,
-      body: BlocBuilder<HomeScreenCubit, StateController<HomeScreenState>>(
+      body: BlocConsumer<HomeScreenCubit, StateController<HomeScreenState>>(
         bloc: homeScreenCubit,
+        listener: (context, state) {
+          if (state is Error) {
+            SnackbarHelper.error(
+              message: state.inferredErrorMessage ?? 'Error occurred',
+            );
+          }
+        },
         builder: (context, state) {
           return Column(
             children: [
@@ -220,7 +90,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       key: ValueKey(groupItem.id),
                       decoration: BoxDecoration(color: Colors.transparent),
                       child: CardItemComponent(
+                        groupId: group.headerData.groupId,
                         taskModel: groupItem as TaskModel,
+                        onTaskUpdated: () {
+                          homeScreenCubit.init();
+                        },
                       ),
                     );
                   },
@@ -246,7 +120,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             onTap: () async {
                               await showDialog(
                                 context: context,
-                                builder: (context) => AddTaskDialog(),
+                                builder:
+                                    (context) => AddTaskDialog(
+                                      groupId: groupData.headerData.groupId,
+                                      onTaskAdded: () {
+                                        homeScreenCubit.init();
+                                      },
+                                    ),
                               );
                             },
                           ),

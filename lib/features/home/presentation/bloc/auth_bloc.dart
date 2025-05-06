@@ -1,3 +1,4 @@
+import 'package:assesment_motio/core/services/hive_service.dart';
 import 'package:assesment_motio/core/services/storage_service.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -73,6 +74,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       try {
         emit(AuthLoading());
         await SecureStorageService.instance.deleteAllSecureData();
+        await HiveService.instance.clearAll();
         emit(LoggedOut());
       } catch (e, s) {
         Logger().e(e.toString(), error: e, stackTrace: s);

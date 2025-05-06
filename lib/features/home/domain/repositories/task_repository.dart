@@ -1,5 +1,6 @@
 import 'package:assesment_motio/features/home/data/datasources/task_datasource.dart';
 import 'package:assesment_motio/features/home/data/models/group_model.dart';
+import 'package:assesment_motio/features/home/data/models/task_model.dart';
 
 class TaskRepository {
   final TaskDatasource datasource;
@@ -19,5 +20,13 @@ class TaskRepository {
 
   Future<void> deleteGroup(String groupId) async {
     await datasource.deleteGroup(groupId);
+  }
+
+  Future<void> addTaskToGroup(String groupId, TaskModel task) async {
+    await datasource.addTaskToGroup(groupId, task);
+  }
+
+  Future<void> updateTaskInGroup(String groupId, TaskModel task) async {
+    await datasource.updateTaskInGroup(groupId, task);
   }
 }

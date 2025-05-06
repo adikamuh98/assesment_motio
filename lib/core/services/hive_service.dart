@@ -21,10 +21,10 @@ class HiveService {
     Hive.registerAdapter(GroupModelAdapter());
     Hive.registerAdapter(TaskModelAdapter());
 
-    await _initGroupBox();
+    await initGroupBox();
   }
 
-  Future<void> _initGroupBox() async {
+  Future<void> initGroupBox() async {
     final groups = await getAllGroups();
 
     if (groups.isEmpty) {

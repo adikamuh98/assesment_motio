@@ -6,6 +6,8 @@ import 'package:assesment_motio/features/home/domain/usecases/add_group.dart';
 import 'package:assesment_motio/features/home/domain/usecases/delete_group.dart';
 import 'package:assesment_motio/features/home/domain/usecases/get_all_groups.dart';
 import 'package:assesment_motio/features/home/domain/usecases/update_group.dart';
+import 'package:assesment_motio/features/home/domain/usecases/update_task_in_group.dart';
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
@@ -28,19 +30,32 @@ class HomeScreenCubit extends Cubit<StateController<HomeScreenState>> {
   final AddGroup addGroupUsecase;
   final UpdateGroup updateGroupUsecase;
   final DeleteGroup deleteGroupUsecase;
+  final UpdateTaskInGroup updateTaskInGroupUsecase;
+  late final AppFlowyBoardController controller;
 
   HomeScreenCubit({
     required this.getAllGroupsUsecase,
     required this.addGroupUsecase,
     required this.updateGroupUsecase,
     required this.deleteGroupUsecase,
-  }) : super(StateController.idle(data: HomeScreenState(groups: [])));
+    required this.updateTaskInGroupUsecase,
+  }) : super(StateController.idle(data: HomeScreenState(groups: []))) {
+    controller = AppFlowyBoardController(
+      onMoveGroup: (fromGroupId, fromIndex, toGroupId, toIndex) {},
+      onMoveGroupItem: (groupId, fromIndex, toIndex) {
+        _onMoveGroupItem.call(groupId, fromIndex, toIndex);
+      },
+      onMoveGroupItemToGroup: (fromGroupId, fromIndex, toGroupId, toIndex) {},
+    );
+  }
 
-  final AppFlowyBoardController controller = AppFlowyBoardController(
-    onMoveGroup: (fromGroupId, fromIndex, toGroupId, toIndex) {},
-    onMoveGroupItem: (groupId, fromIndex, toIndex) {},
-    onMoveGroupItemToGroup: (fromGroupId, fromIndex, toGroupId, toIndex) {},
-  );
+  // final AppFlowyBoardController controller = AppFlowyBoardController(
+  //   onMoveGroup: (fromGroupId, fromIndex, toGroupId, toIndex) {},
+  //   onMoveGroupItem: (groupId, fromIndex, toIndex) {
+  //     _onMoveGroupItem.call(groupId, fromIndex, toIndex);
+  //   },
+  //   onMoveGroupItemToGroup: (fromGroupId, fromIndex, toGroupId, toIndex) {},
+
   final AppFlowyBoardScrollController boardController =
       AppFlowyBoardScrollController();
 
@@ -68,22 +83,47 @@ class HomeScreenCubit extends Cubit<StateController<HomeScreenState>> {
       final indexB = groupOrder.indexOf(b.id);
       return indexA.compareTo(indexB);
     });
-    return groups;
+    return groups.map((group) {
+      final sortedItems = _sortTasks(group.items);
+      return group.copyWith(items: sortedItems);
+    }).toList();
   }
 
-  void addTask(String groupId, TaskModel task) async {
-    emit(StateController.loading(data: state.inferredData));
-    try {
-      final group = state.inferredData!.groups.firstWhere(
-        (g) => g.id == groupId,
-      );
-      final updatedGroup = group.copyWith(items: [...group.items, task]);
+  List<TaskModel> _sortTasks(List<TaskModel> tasks) {
+    tasks.sort((a, b) {
+      return a.orderIndex.compareTo(b.orderIndex);
+    });
+    return tasks;
+  }
 
-      await addGroupUsecase.call(updatedGroup);
+  void _onMoveGroupItem(String groupId, int fromIndex, int toIndex) async {
+    try {
+      final curGroup = state.inferredData?.groups.firstWhereOrNull(
+        (group) => group.id == groupId,
+      );
+
+      if (curGroup == null) {
+        emit(StateController.error(errorMessage: 'Group not found'));
+        return;
+      }
+
+      final task = curGroup.items[fromIndex];
+      final updatedItems = <TaskModel>[];
+      for (var i = 0; i < curGroup.items.length; i++) {
+        updatedItems.add(curGroup.items[i].copyWith(orderIndex: i));
+      }
+      final updatedGroup = curGroup.copyWith(items: updatedItems);
+      // final newestGroup = updatedGroup.copyWith(
+      //   items:
+      //       updatedGroup.items.mapIndexed((index, item) {
+      //         return item.copyWith(orderIndex: index);
+      //       }).toList(),
+      // );
+      await updateGroupUsecase.call(updatedGroup);
       init();
     } catch (e, s) {
       Logger().e(e.toString(), error: e, stackTrace: s);
-      emit(StateController.error(errorMessage: 'Failed to add task'));
+      emit(StateController.error(errorMessage: 'Failed to move task'));
     }
   }
 }
