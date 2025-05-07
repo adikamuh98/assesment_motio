@@ -42,36 +42,36 @@ class HomeScreenCubit extends Cubit<StateController<HomeScreenState>> {
   }) : super(StateController.idle(data: HomeScreenState(groups: []))) {
     controller = AppFlowyBoardController(
       onMoveGroup: (fromGroupId, fromIndex, toGroupId, toIndex) {},
-      onMoveGroupItem: (groupId, fromIndex, toIndex) {
-        _onMoveGroupItem.call(groupId, fromIndex, toIndex);
-      },
-      onMoveGroupItemToGroup: (fromGroupId, fromIndex, toGroupId, toIndex) {},
+      onMoveGroupItem: _onMoveGroupItem,
+      onMoveGroupItemToGroup: _onMoveGroupItemToGroup,
     );
   }
-
-  // final AppFlowyBoardController controller = AppFlowyBoardController(
-  //   onMoveGroup: (fromGroupId, fromIndex, toGroupId, toIndex) {},
-  //   onMoveGroupItem: (groupId, fromIndex, toIndex) {
-  //     _onMoveGroupItem.call(groupId, fromIndex, toIndex);
-  //   },
-  //   onMoveGroupItemToGroup: (fromGroupId, fromIndex, toGroupId, toIndex) {},
 
   final AppFlowyBoardScrollController boardController =
       AppFlowyBoardScrollController();
 
   void init() async {
-    emit(StateController.loading());
+    emit(StateController.loading(data: state.inferredData));
     try {
       final groups = _sortGroups(await getAllGroupsUsecase.call());
       for (var group in groups) {
         controller.addGroup(
-          AppFlowyGroupData(id: group.id, name: group.name, items: group.items),
+          AppFlowyGroupData(
+            id: group.id,
+            name: group.name,
+            items: List<AppFlowyGroupItem>.from(group.items),
+          ),
         );
       }
       emit(StateController.success(HomeScreenState(groups: groups)));
     } catch (e, s) {
       Logger().e(e.toString(), error: e, stackTrace: s);
-      emit(StateController.error(errorMessage: 'Failed to load groups'));
+      emit(
+        StateController.error(
+          errorMessage: 'Failed to load groups',
+          data: state.inferredData,
+        ),
+      );
     }
   }
 
@@ -96,6 +96,110 @@ class HomeScreenCubit extends Cubit<StateController<HomeScreenState>> {
     return tasks;
   }
 
+  void markTaskAsDone(String groupId, TaskModel task) async {
+    try {
+      emit(StateController.loading(data: state.inferredData));
+      final updatedTask = task.copyWith(isCompleted: true);
+      final group = state.inferredData?.groups.firstWhereOrNull(
+        (group) => group.id == groupId,
+      );
+      if (group != null) {
+        final updatedItems =
+            List<TaskModel>.from(group.items)
+              ..removeWhere((t) => t.taskId == task.taskId)
+              ..add(updatedTask);
+        final updatedGroup = group.copyWith(items: updatedItems);
+        await updateGroupUsecase.call(updatedGroup);
+        controller.updateGroupItem(groupId, updatedTask);
+        init();
+      } else {
+        emit(
+          StateController.error(
+            errorMessage: 'Group not found',
+            data: state.inferredData,
+          ),
+        );
+      }
+    } catch (e, s) {
+      Logger().e(e.toString(), error: e, stackTrace: s);
+      emit(
+        StateController.error(
+          errorMessage: 'Failed to mark task as done',
+          data: state.inferredData,
+        ),
+      );
+    }
+  }
+
+  void markTaskAsUndone(String groupId, TaskModel task) async {
+    try {
+      emit(StateController.loading(data: state.inferredData));
+      final updatedTask = task.copyWith(isCompleted: false);
+      final group = state.inferredData?.groups.firstWhereOrNull(
+        (group) => group.id == groupId,
+      );
+      if (group != null) {
+        final updatedItems =
+            List<TaskModel>.from(group.items)
+              ..removeWhere((t) => t.taskId == task.taskId)
+              ..add(updatedTask);
+        final updatedGroup = group.copyWith(items: updatedItems);
+        await updateGroupUsecase.call(updatedGroup);
+        controller.updateGroupItem(groupId, updatedTask);
+        init();
+      } else {
+        emit(
+          StateController.error(
+            errorMessage: 'Group not found',
+            data: state.inferredData,
+          ),
+        );
+      }
+    } catch (e, s) {
+      Logger().e(e.toString(), error: e, stackTrace: s);
+      emit(
+        StateController.error(
+          errorMessage: 'Failed to mark task as undone',
+          data: state.inferredData,
+        ),
+      );
+    }
+  }
+
+  void deleteTaskFromGroup(String groupId, TaskModel task) async {
+    try {
+      emit(StateController.loading(data: state.inferredData));
+      final group = state.inferredData?.groups.firstWhereOrNull(
+        (group) => group.id == groupId,
+      );
+      if (group != null) {
+        final updatedItems = List<TaskModel>.from(group.items)
+          ..removeWhere((t) => t.taskId == task.taskId);
+        final updatedGroup = _updateTaskOrderIndex(
+          group.copyWith(items: updatedItems),
+        );
+        await updateGroupUsecase.call(updatedGroup);
+        controller.removeGroupItem(groupId, task.taskId);
+        init();
+      } else {
+        emit(
+          StateController.error(
+            errorMessage: 'Group not found',
+            data: state.inferredData,
+          ),
+        );
+      }
+    } catch (e, s) {
+      Logger().e(e.toString(), error: e, stackTrace: s);
+      emit(
+        StateController.error(
+          errorMessage: 'Failed to delete task',
+          data: state.inferredData,
+        ),
+      );
+    }
+  }
+
   void _onMoveGroupItem(String groupId, int fromIndex, int toIndex) async {
     try {
       final curGroup = state.inferredData?.groups.firstWhereOrNull(
@@ -107,23 +211,76 @@ class HomeScreenCubit extends Cubit<StateController<HomeScreenState>> {
         return;
       }
 
-      final task = curGroup.items[fromIndex];
-      final updatedItems = <TaskModel>[];
-      for (var i = 0; i < curGroup.items.length; i++) {
-        updatedItems.add(curGroup.items[i].copyWith(orderIndex: i));
-      }
-      final updatedGroup = curGroup.copyWith(items: updatedItems);
-      // final newestGroup = updatedGroup.copyWith(
-      //   items:
-      //       updatedGroup.items.mapIndexed((index, item) {
-      //         return item.copyWith(orderIndex: index);
-      //       }).toList(),
-      // );
+      final updatedGroup = _updateTaskOrderIndex(curGroup);
       await updateGroupUsecase.call(updatedGroup);
       init();
     } catch (e, s) {
       Logger().e(e.toString(), error: e, stackTrace: s);
-      emit(StateController.error(errorMessage: 'Failed to move task'));
+      emit(
+        StateController.error(
+          errorMessage: 'Failed to move task',
+          data: state.inferredData,
+        ),
+      );
     }
+  }
+
+  void _onMoveGroupItemToGroup(
+    String fromGroupId,
+    int fromIndex,
+    String toGroupId,
+    int toIndex,
+  ) async {
+    try {
+      final fromGroup = state.inferredData?.groups.firstWhereOrNull(
+        (group) => group.id == fromGroupId,
+      );
+      final toGroup = state.inferredData?.groups.firstWhereOrNull(
+        (group) => group.id == toGroupId,
+      );
+
+      if (fromGroup == null || toGroup == null) {
+        emit(StateController.error(errorMessage: 'Group not found'));
+        return;
+      }
+
+      final movedTask = fromGroup.items[fromIndex];
+      final updatedFromItems = List<TaskModel>.from(fromGroup.items)
+        ..removeAt(fromIndex);
+      final updatedToItems = List<TaskModel>.from(toGroup.items)
+        ..insert(toIndex, movedTask.copyWith(orderIndex: toIndex));
+
+      final updatedFromGroup = _updateTaskOrderIndex(
+        fromGroup.copyWith(items: updatedFromItems),
+      );
+      final updatedToGroup = _updateTaskOrderIndex(
+        toGroup.copyWith(items: updatedToItems),
+      );
+
+      // await updateTaskInGroupUsecase.call(
+      //   fromGroupId,
+      //   movedTask.copyWith(orderIndex: toIndex),
+      // );
+      await updateGroupUsecase.call(updatedFromGroup);
+      await updateGroupUsecase.call(updatedToGroup);
+      init();
+    } catch (e, s) {
+      Logger().e(e.toString(), error: e, stackTrace: s);
+      emit(
+        StateController.error(
+          errorMessage: 'Failed to move task',
+          data: state.inferredData,
+        ),
+      );
+    }
+  }
+
+  GroupModel _updateTaskOrderIndex(GroupModel group) {
+    final updatedItems = <TaskModel>[];
+    for (var i = 0; i < group.items.length; i++) {
+      updatedItems.add(group.items[i].copyWith(orderIndex: i));
+    }
+
+    return group.copyWith(items: updatedItems);
   }
 }

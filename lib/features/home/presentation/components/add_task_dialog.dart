@@ -1,3 +1,4 @@
+import 'package:appflowy_board/appflowy_board.dart';
 import 'package:assesment_motio/core/helper/snackbar_helper.dart';
 import 'package:assesment_motio/core/models/state_controller.dart';
 import 'package:assesment_motio/core/themes/app_button.dart';
@@ -17,11 +18,13 @@ class AddTaskDialog extends StatefulWidget {
   final String groupId;
   final TaskModel? taskModel;
   final Function()? onTaskAdded;
+  final AppFlowyBoardController boardController;
   const AddTaskDialog({
     super.key,
     required this.groupId,
     this.onTaskAdded,
     this.taskModel,
+    required this.boardController,
   });
 
   @override
@@ -37,6 +40,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
     _addTaskDialogCubit = AddTaskDialogCubit(
       addTaskToGroupUsecase: context.read<AddTaskToGroup>(),
       updateTaskInGroupUsecase: context.read<UpdateTaskInGroup>(),
+      boardController: widget.boardController,
     )..init(widget.taskModel);
   }
 

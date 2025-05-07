@@ -1,3 +1,4 @@
+import 'package:appflowy_board/appflowy_board.dart';
 import 'package:assesment_motio/core/formatter/date_formatter.dart';
 import 'package:assesment_motio/core/helper/string_helper.dart';
 import 'package:assesment_motio/core/models/state_controller.dart';
@@ -11,10 +12,12 @@ import 'package:logger/logger.dart';
 class AddTaskDialogCubit extends Cubit<StateController<bool>> {
   final AddTaskToGroup addTaskToGroupUsecase;
   final UpdateTaskInGroup updateTaskInGroupUsecase;
+  final AppFlowyBoardController boardController;
 
   AddTaskDialogCubit({
     required this.addTaskToGroupUsecase,
     required this.updateTaskInGroupUsecase,
+    required this.boardController,
   }) : super(StateController.idle());
 
   final TextEditingController nameController = TextEditingController();
@@ -56,6 +59,7 @@ class AddTaskDialogCubit extends Cubit<StateController<bool>> {
         updatedAt: DateFormatter.formatDateTime(DateTime.now()),
         orderIndex: 0,
       );
+      boardController.addGroupItem(groupId, task);
 
       await addTaskToGroupUsecase.call(groupId, task);
       emit(StateController.success(true));
@@ -89,6 +93,7 @@ class AddTaskDialogCubit extends Cubit<StateController<bool>> {
         dueDate: DateFormatter.formatDateTime(selectedDueDate!),
         updatedAt: DateFormatter.formatDateTime(DateTime.now()),
       );
+      boardController.updateGroupItem(groupId, updatedTask);
 
       await updateTaskInGroupUsecase.call(groupId, updatedTask);
       emit(StateController.success(true));

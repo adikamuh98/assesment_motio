@@ -4,6 +4,7 @@ import 'package:assesment_motio/core/models/state_controller.dart';
 import 'package:assesment_motio/core/themes/app_button.dart';
 import 'package:assesment_motio/core/themes/app_colors.dart';
 import 'package:assesment_motio/core/themes/app_fonts.dart';
+import 'package:assesment_motio/core/widget/app_alert_dialog.dart';
 import 'package:assesment_motio/features/home/data/models/task_model.dart';
 import 'package:assesment_motio/features/home/domain/usecases/add_group.dart';
 import 'package:assesment_motio/features/home/domain/usecases/delete_group.dart';
@@ -58,8 +59,31 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () {
-              context.read<AuthBloc>().add(Logout());
+            onPressed: () async {
+              await showDialog(
+                context: context,
+                builder: (context) {
+                  return AppAlertDialog(
+                    text: 'Are you sure you want to logout?',
+                    content:
+                        'You will be logged out of your account and all data will be erased.',
+                    contentIcon: Icon(
+                      Icons.warning_amber_outlined,
+                      color: appColors.error,
+                      size: 40,
+                    ),
+                    cancelText: 'Cancel',
+                    acceptText: 'Logout',
+                    onCancel: () {
+                      Navigator.of(context).pop();
+                    },
+                    onAccept: () {
+                      context.read<AuthBloc>().add(Logout());
+                      Navigator.of(context).pop();
+                    },
+                  );
+                },
+              );
             },
           ),
         ],
@@ -92,8 +116,24 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: CardItemComponent(
                         groupId: group.headerData.groupId,
                         taskModel: groupItem as TaskModel,
-                        onTaskUpdated: () {
-                          homeScreenCubit.init();
+                        boardController: homeScreenCubit.controller,
+                        markTaskAsDone: () {
+                          homeScreenCubit.markTaskAsDone(
+                            group.headerData.groupId,
+                            groupItem,
+                          );
+                        },
+                        markTaskAsUndone: () {
+                          homeScreenCubit.markTaskAsUndone(
+                            group.headerData.groupId,
+                            groupItem,
+                          );
+                        },
+                        deleteTask: () {
+                          homeScreenCubit.deleteTaskFromGroup(
+                            group.headerData.groupId,
+                            groupItem,
+                          );
                         },
                       ),
                     );
@@ -123,6 +163,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 builder:
                                     (context) => AddTaskDialog(
                                       groupId: groupData.headerData.groupId,
+                                      boardController:
+                                          homeScreenCubit.controller,
                                       onTaskAdded: () {
                                         homeScreenCubit.init();
                                       },
