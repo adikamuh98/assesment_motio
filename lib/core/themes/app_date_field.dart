@@ -83,7 +83,10 @@ class _AppDateFieldState extends State<AppDateField> {
             prefixIcon: Icon(
               Icons.calendar_month_outlined,
               size: 16,
-              color: appColors.primary[10],
+              color:
+                  Theme.of(context).brightness == Brightness.light
+                      ? appColors.primary
+                      : appColors.black,
             ),
             prefixIconConstraints: const BoxConstraints(
               minWidth: 40,
@@ -93,7 +96,15 @@ class _AppDateFieldState extends State<AppDateField> {
             fillColor: appColors.white,
             label:
                 widget.label != null
-                    ? Text(widget.label!, style: appFonts.primary.ts)
+                    ? Text(
+                      widget.label!,
+                      style: appFonts.ts.copyWith(
+                        color:
+                            Theme.of(context).brightness == Brightness.light
+                                ? appColors.primary
+                                : appColors.black,
+                      ),
+                    )
                     : null,
             labelStyle: appFonts.primary.ts,
             hintText: widget.label,
@@ -116,21 +127,36 @@ class _AppDateFieldState extends State<AppDateField> {
   InputBorder get border {
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(10),
-      borderSide: BorderSide(color: appColors.primary),
+      borderSide: BorderSide(
+        color:
+            Theme.of(context).brightness == Brightness.light
+                ? appColors.primary
+                : appColors.black,
+      ),
     );
   }
 
   InputBorder get focusedBorder {
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(10),
-      borderSide: BorderSide(color: appColors.info),
+      borderSide: BorderSide(
+        color:
+            Theme.of(context).brightness == Brightness.light
+                ? appColors.primary
+                : appColors.black,
+      ),
     );
   }
 
   InputBorder get errorBorder {
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(10),
-      borderSide: BorderSide(color: appColors.error),
+      borderSide: BorderSide(
+        color:
+            Theme.of(context).brightness == Brightness.light
+                ? appColors.primary
+                : appColors.error.surface,
+      ),
     );
   }
 }

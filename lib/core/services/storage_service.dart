@@ -32,4 +32,5 @@ class SecureStorageService {
 
 class SecureKey {
   static final String token = 'token';
+  static final String themeMode = 'theme_mode';
 }

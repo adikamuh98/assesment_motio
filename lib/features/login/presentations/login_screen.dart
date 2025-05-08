@@ -1,6 +1,7 @@
 import 'package:assesment_motio/core/helper/snackbar_helper.dart';
 import 'package:assesment_motio/core/models/state_controller.dart';
 import 'package:assesment_motio/core/themes/app_button.dart';
+import 'package:assesment_motio/core/themes/app_colors.dart';
 import 'package:assesment_motio/core/themes/app_fonts.dart';
 import 'package:assesment_motio/core/themes/app_text_field.dart';
 import 'package:assesment_motio/features/home/presentation/bloc/auth_bloc.dart';
@@ -45,13 +46,13 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Login'),
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
-        foregroundColor: Colors.black,
-        shadowColor: Colors.black,
+        backgroundColor: appColors.white,
+        surfaceTintColor: appColors.white,
+        foregroundColor: appColors.black,
+        shadowColor: appColors.black,
         centerTitle: true,
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: appColors.white,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: BlocConsumer<LoginScreenCubit, StateController<bool>>(
@@ -118,7 +119,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                   child: Text(
                     'Create account',
-                    style: appFonts.primary.bold.ts,
+                    style: appFonts.primary.bold.ts.copyWith(
+                      color:
+                          Theme.of(context).brightness == Brightness.light
+                              ? appColors.primary
+                              : appColors.black,
+                    ),
                   ),
                 ),
               ],

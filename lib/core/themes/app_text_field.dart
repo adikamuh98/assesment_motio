@@ -52,23 +52,39 @@ class AppTextField extends StatelessWidget {
           decoration: InputDecoration(
             filled: true,
             fillColor: appColors.white,
-            label: label != null
-                ? Text(
-                    label!,
-                    style: appFonts.primary.ts,
-                  )
-                : null,
-            labelStyle: appFonts.primary.ts,
+            label:
+                label != null
+                    ? Text(
+                      label!,
+                      style: appFonts.ts.copyWith(
+                        // color:
+                        //     Theme.of(context).brightness == Brightness.light
+                        //         ? appColors.primary
+                        //         : appColors.black,
+                      ),
+                    )
+                    : null,
+            // labelStyle: appFonts.ts.copyWith(
+            //   color:
+            //       Theme.of(context).brightness == Brightness.light
+            //           ? appColors.primary
+            //           : appColors.black,
+            // ),
             hintText: label,
-            hintStyle: appFonts.caption.primary.ts,
+            // hintStyle: appFonts.caption.ts.copyWith(
+            //   color:
+            //       Theme.of(context).brightness == Brightness.light
+            //           ? appColors.placeholder
+            //           : appColors.black,
+            // ),
             contentPadding: const EdgeInsets.symmetric(
               vertical: 12,
               horizontal: 22,
             ),
-            border: customBorder ?? border,
-            enabledBorder: customBorder ?? border,
-            focusedBorder: customFocusedBorder ?? focusedBorder,
-            errorBorder: errorBorder,
+            border: customBorder ?? border(context),
+            enabledBorder: customBorder ?? border(context),
+            focusedBorder: customFocusedBorder ?? focusedBorder(context),
+            errorBorder: errorBorder(context),
             suffixIcon: suffixIcon,
             errorStyle: appFonts.caption.error.ts,
           ),
@@ -77,24 +93,39 @@ class AppTextField extends StatelessWidget {
     );
   }
 
-  InputBorder get border {
+  InputBorder border(BuildContext context) {
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(multiLines ? 10 : 10),
-      borderSide: BorderSide(color: appColors.primary),
+      borderSide: BorderSide(
+        color:
+            Theme.of(context).brightness == Brightness.light
+                ? appColors.primary
+                : Colors.white,
+      ),
     );
   }
 
-  InputBorder get focusedBorder {
+  InputBorder focusedBorder(BuildContext context) {
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(multiLines ? 10 : 10),
-      borderSide: BorderSide(color: appColors.info),
+      borderSide: BorderSide(
+        color:
+            Theme.of(context).brightness == Brightness.light
+                ? appColors.info
+                : Colors.white,
+      ),
     );
   }
 
-  InputBorder get errorBorder {
+  InputBorder errorBorder(BuildContext context) {
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(multiLines ? 10 : 10),
-      borderSide: BorderSide(color: appColors.error),
+      borderSide: BorderSide(
+        color:
+            Theme.of(context).brightness == Brightness.light
+                ? appColors.error
+                : appColors.error.surface,
+      ),
     );
   }
 }

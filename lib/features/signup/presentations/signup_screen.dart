@@ -1,6 +1,7 @@
 import 'package:assesment_motio/core/helper/snackbar_helper.dart';
 import 'package:assesment_motio/core/models/state_controller.dart';
 import 'package:assesment_motio/core/themes/app_button.dart';
+import 'package:assesment_motio/core/themes/app_colors.dart';
 import 'package:assesment_motio/core/themes/app_text_field.dart';
 import 'package:assesment_motio/features/signup/domain/usecases/signup_firebase.dart';
 import 'package:assesment_motio/features/signup/presentations/bloc/signup_screen_cubit.dart';
@@ -42,13 +43,13 @@ class _SignupScreenState extends State<SignupScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create Account'),
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
-        foregroundColor: Colors.black,
-        shadowColor: Colors.black,
+        backgroundColor: appColors.white,
+        surfaceTintColor: appColors.white,
+        foregroundColor: appColors.black,
+        shadowColor: appColors.black,
         centerTitle: true,
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: appColors.white,
       body: BlocConsumer<SignupScreenCubit, StateController<bool>>(
         bloc: _signupScreenCubit,
         listener: (context, state) {

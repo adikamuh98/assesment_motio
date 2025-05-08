@@ -3,11 +3,7 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'app_fonts.dart';
 
-enum AppButtonType {
-  normal,
-  big,
-  small,
-}
+enum AppButtonType { normal, big, small }
 
 class AppButton extends StatelessWidget {
   final Color? color;
@@ -54,20 +50,11 @@ class AppButton extends StatelessWidget {
     } else {
       switch (type) {
         case AppButtonType.normal:
-          return const EdgeInsets.symmetric(
-            horizontal: 30,
-            vertical: 16,
-          );
+          return const EdgeInsets.symmetric(horizontal: 30, vertical: 16);
         case AppButtonType.big:
-          return const EdgeInsets.symmetric(
-            horizontal: 18,
-            vertical: 8,
-          );
+          return const EdgeInsets.symmetric(horizontal: 18, vertical: 8);
         case AppButtonType.small:
-          return const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 6,
-          );
+          return const EdgeInsets.symmetric(horizontal: 12, vertical: 6);
       }
     }
   }
@@ -83,9 +70,9 @@ class AppButton extends StatelessWidget {
 
   Color? get iconColor {
     if (isDisabled) {
-      return appFonts.disabled.color;
+      return appColors.disabledButtonFont;
     } else {
-      return appFonts.white.color;
+      return Colors.white;
     }
   }
 
@@ -93,16 +80,19 @@ class AppButton extends StatelessWidget {
     if (isDisabled) {
       switch (type) {
         case AppButtonType.small:
-          return appFonts.caption.disabled.semibold.ts;
+          return appFonts.caption.disabled.semibold.ts.copyWith(
+            color: Colors.white,
+          );
         default:
-          return appFonts.disabled.semibold.ts;
+          return appFonts.disabled.semibold.ts.copyWith(color: Colors.white);
       }
     } else {
       switch (type) {
         case AppButtonType.small:
-          return appFonts.caption.white.semibold.ts;
+          return appFonts.caption.semibold.ts.copyWith(color: Colors.white);
         default:
-          return textStyle ?? appFonts.white.semibold.ts;
+          return textStyle ??
+              appFonts.white.semibold.ts.copyWith(color: Colors.white);
       }
     }
   }
@@ -139,40 +129,28 @@ class AppButton extends StatelessWidget {
   Widget get buttonChild {
     return Container(
       padding: padding,
-      child: (child != null)
-          ? child
-          : Row(
-              mainAxisSize: isFitParent ? MainAxisSize.max : MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (icon != null) ...[
-                  Icon(
-                    icon,
-                    size: iconSize,
-                    color: iconColor,
-                  ),
+      child:
+          (child != null)
+              ? child
+              : Row(
+                mainAxisSize: isFitParent ? MainAxisSize.max : MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (icon != null) ...[
+                    Icon(icon, size: iconSize, color: iconColor),
+                  ],
+                  if (text != null && icon != null) ...[
+                    const SizedBox(width: 4),
+                  ],
+                  if (text != null) ...[Text(text!, style: ts)],
+                  if (text != null && suffixIcon != null) ...[
+                    const SizedBox(width: 4),
+                  ],
+                  if (suffixIcon != null) ...[
+                    Icon(suffixIcon, size: iconSize - 2, color: iconColor),
+                  ],
                 ],
-                if (text != null && icon != null) ...[
-                  const SizedBox(width: 4),
-                ],
-                if (text != null) ...[
-                  Text(
-                    text!,
-                    style: ts,
-                  ),
-                ],
-                if (text != null && suffixIcon != null) ...[
-                  const SizedBox(width: 4),
-                ],
-                if (suffixIcon != null) ...[
-                  Icon(
-                    suffixIcon,
-                    size: iconSize - 2,
-                    color: iconColor,
-                  ),
-                ],
-              ],
-            ),
+              ),
     );
   }
 }

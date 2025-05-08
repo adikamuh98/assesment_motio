@@ -10,11 +10,16 @@ class SnackbarHelper {
     Color? backgroundColor,
     Duration duration = const Duration(seconds: 2),
   }) {
+    final context = navState.currentContext!;
     final snackBar = SnackBar(
       content: Text(
         message,
         style: appFonts.white.ts.copyWith(
-          color: textColor ?? appColors.white,
+          color:
+              textColor ??
+              (Theme.of(context).brightness == Brightness.light
+                  ? appColors.white
+                  : appColors.black),
           fontSize: 14,
         ),
       ),
@@ -22,7 +27,6 @@ class SnackbarHelper {
       duration: duration,
     );
 
-    final context = navState.currentContext!;
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 

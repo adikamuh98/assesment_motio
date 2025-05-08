@@ -28,21 +28,13 @@ class AppAlertDialog extends StatelessWidget {
     return AlertDialog(
       backgroundColor: appColors.white,
       surfaceTintColor: appColors.white,
-      title: Text(
-        text,
-        style: appFonts.bold.ts,
-        textAlign: TextAlign.center,
-      ),
+      title: Text(text, style: appFonts.bold.ts, textAlign: TextAlign.center),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           contentIcon,
           const SizedBox(height: 16),
-          Text(
-            content,
-            style: appFonts.ts,
-            textAlign: TextAlign.center,
-          ),
+          Text(content, style: appFonts.ts, textAlign: TextAlign.center),
         ],
       ),
       actions: [
@@ -53,7 +45,7 @@ class AppAlertDialog extends StatelessWidget {
                 onTap: () => onCancel.call(),
                 text: cancelText,
                 color: appColors.primary,
-                textStyle: appFonts.bold.white.ts,
+                textStyle: appFonts.bold.ts.copyWith(color: Colors.white),
               ),
             ),
             const SizedBox(width: 8),

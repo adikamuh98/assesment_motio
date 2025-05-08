@@ -1,6 +1,9 @@
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:assesment_motio/core/helper/snackbar_helper.dart';
 import 'package:assesment_motio/core/services/hive_service.dart';
+import 'package:assesment_motio/core/services/storage_service.dart';
 import 'package:assesment_motio/core/themes/app_colors.dart';
+import 'package:assesment_motio/core/themes/app_theme_data.dart';
 import 'package:assesment_motio/features/home/data/datasources/task_datasource.dart';
 import 'package:assesment_motio/features/home/domain/repositories/task_repository.dart';
 import 'package:assesment_motio/features/home/domain/usecases/add_group.dart';
@@ -30,23 +33,32 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await HiveService.instance.init();
+  final savedThemeMode = await SecureStorageService.instance.readSecureData(
+    SecureKey.themeMode,
+  );
 
-  runApp(MainApp());
+  runApp(MainApp(savedThemeMode: savedThemeMode));
 }
 
 class MainApp extends StatefulWidget {
-  const MainApp({super.key});
+  final String? savedThemeMode;
+  const MainApp({super.key, this.savedThemeMode});
   @override
   State<MainApp> createState() => _MainAppState();
 }
 
 class _MainAppState extends State<MainApp> {
   late final AuthBloc _authBloc;
+  late final AdaptiveThemeMode initialThemeMode;
 
   @override
   void initState() {
     super.initState();
     _authBloc = AuthBloc()..add(Init());
+    initialThemeMode =
+        widget.savedThemeMode == 'dark'
+            ? AdaptiveThemeMode.dark
+            : AdaptiveThemeMode.light;
   }
 
   @override
@@ -64,30 +76,39 @@ class _MainAppState extends State<MainApp> {
                 child: CircularProgressIndicator(color: appColors.primary),
               );
             },
-            child: MaterialApp(
-              navigatorKey: navState,
-              home: BlocConsumer<AuthBloc, AuthState>(
-                bloc: _authBloc,
-                listener: (context, state) {
-                  if (state is AuthError) {
-                    SnackbarHelper.error(message: state.message);
-                  }
+            child: AdaptiveTheme(
+              light: AppThemeData.lightTheme,
+              dark: AppThemeData.darkTheme,
+              initial: initialThemeMode,
+              builder: (lightThme, darkTheme) {
+                return MaterialApp(
+                  navigatorKey: navState,
+                  theme: lightThme,
+                  darkTheme: darkTheme,
+                  home: BlocConsumer<AuthBloc, AuthState>(
+                    bloc: _authBloc,
+                    listener: (context, state) {
+                      if (state is AuthError) {
+                        SnackbarHelper.error(message: state.message);
+                      }
 
-                  if (state is AuthLoading) {
-                    context.loaderOverlay.show();
-                  } else {
-                    context.loaderOverlay.hide();
-                  }
-                },
-                builder: (context, state) {
-                  return Scaffold(
-                    body:
-                        state is LoggedIn
-                            ? const HomeScreen()
-                            : const LoginScreen(),
-                  );
-                },
-              ),
+                      if (state is AuthLoading) {
+                        context.loaderOverlay.show();
+                      } else {
+                        context.loaderOverlay.hide();
+                      }
+                    },
+                    builder: (context, state) {
+                      return Scaffold(
+                        body:
+                            state is LoggedIn
+                                ? const HomeScreen()
+                                : const LoginScreen(),
+                      );
+                    },
+                  ),
+                );
+              },
             ),
           ),
         ),
