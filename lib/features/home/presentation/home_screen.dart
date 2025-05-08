@@ -30,6 +30,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late final HomeScreenCubit homeScreenCubit;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -152,10 +153,10 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (context, state) {
           return Column(
             children: [
-              SizedBox(
-                height: 700,
+              Expanded(
                 child: AppFlowyBoard(
                   controller: homeScreenCubit.controller,
+                  scrollController: _scrollController,
                   boardScrollController: homeScreenCubit.boardController,
                   groupConstraints: BoxConstraints.tightFor(
                     width: MediaQuery.of(context).size.width - 50,
